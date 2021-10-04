@@ -4,7 +4,7 @@ import static nextstep.utils.Console.readLine;
 
 public class Player {
 
-    private Inning inning;
+    private final Inning inning;
     private final PlayerValidator playerValidator;
 
     public Player(Inning inning) {
@@ -13,13 +13,18 @@ public class Player {
     }
 
     public Player() {
-        this.playerValidator = new PlayerValidator();
+        this(new Judge());
     }
 
     public boolean throwByThreeBall() {
-        String insertNumber = readLine();
-        playerValidator.validation(insertNumber);
-        return checkBall(insertNumber);
+        try{
+            String insertNumber = readLine();
+            playerValidator.validation(insertNumber);
+            return checkBall(insertNumber);
+        }catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     private boolean checkBall(String insertNumber) {
