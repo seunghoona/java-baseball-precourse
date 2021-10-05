@@ -4,10 +4,14 @@ import nextstep.test.NSTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static baseball.Opponent.createBaseBallNumbers;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,9 +37,11 @@ class JudgeTest extends NSTest {
         assertThat(isThreeStrike).isTrue();
     }
 
-    @Test
+
     @DisplayName("입력된 값에 따라 스트라이크, 볼 갯수가 맞는지 ")
-    public void ball() {
+    @ParameterizedTest
+    @MethodSource("randomBallParameter")
+    public void ball(String insertNumbers, String resultMessage) {
 
         Set<String> resultSet = new LinkedHashSet<>();
         resultSet.add("1");
@@ -50,9 +56,17 @@ class JudgeTest extends NSTest {
                     .when(Opponent::getCreateBaseBallNumbers)
                     .thenReturn(resultSet);
             Judge judge = new Judge();
-            judge.checkBall("135");
-            verify("3스트라이크");
+            judge.checkBall(insertNumbers);
+            verify(resultMessage);
         }
+    }
+
+    private static Stream<Arguments> randomBallParameter() { // argument source method
+        return Stream.of(
+                Arguments.of("135", "3스트라이크"),
+                Arguments.of("513", "3볼"),
+                Arguments.of("153", "1스트라이크 2볼")
+        );
     }
 
     /**

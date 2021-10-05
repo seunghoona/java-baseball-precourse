@@ -4,7 +4,12 @@ import nextstep.test.NSTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
@@ -27,35 +32,23 @@ class PlayerTest extends NSTest {
         Mockito.verify(inningMock, times(1));
     }
 
-
-    @Test
-    @DisplayName("숫자를 3자 이상 입력시 IllegalArgumentException")
-    void numberLimitThree() {
+    @ParameterizedTest
+    @DisplayName("사용자 입력 validation 문제시 IllegalArgumentException 발생 검증")
+    @MethodSource("validationParamter")
+    void numberLimitThree(String insertNumbers, String resultMessage) {
         PlayerValidator playerValidator = new PlayerValidator();
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                        playerValidator.validation("1234"))
+                        playerValidator.validation(insertNumbers))
                 .withMessageStartingWith("[ERROR]")
-                .withMessageContaining("숫자는 3자리를 입력해야합니다.");
+                .withMessageContaining(resultMessage);
     }
 
-    @Test
-    @DisplayName("숫자가 아닌 문자 입력시 IllegalArgumentException")
-    void NotNumberTest() {
-        PlayerValidator playerValidator = new PlayerValidator();
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                        playerValidator.validation("asdf"))
-                .withMessageStartingWith("[ERROR]")
-                .withMessageContaining("숫자만 입력가능합니다.");
-    }
-
-    @Test
-    @DisplayName("입력된 정보가 중복된 숫자인경우 IllegalArgumentException")
-    public void duplicateNumberTest() {
-        PlayerValidator playerValidator = new PlayerValidator();
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                        playerValidator.validation("111"))
-                .withMessageStartingWith("[ERROR]")
-                .withMessageContaining("중복된 숫자가 있습니다.");
+    private static Stream<Arguments> validationParamter() {
+        return Stream.of(
+                Arguments.of("111", "중복된 숫자가 있습니다."),
+                Arguments.of("asdf", "숫자만 입력가능합니다."),
+                Arguments.of("1234", "숫자는 3자리를 입력해야합니다.")
+        );
     }
 
     @Override
