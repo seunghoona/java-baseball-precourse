@@ -58,7 +58,6 @@ public class Judge implements Inning {
     }
 
     private void createResultMessage() {
-
         if (strike > ONE) {
             resultMessage.append(strike);
             resultMessage.append("스트라이크");
@@ -71,7 +70,6 @@ public class Judge implements Inning {
         if (strike == ONE && ball == ONE) {
             resultMessage.append("낫싱");
         }
-
     }
 
     private void resultMessage() {
